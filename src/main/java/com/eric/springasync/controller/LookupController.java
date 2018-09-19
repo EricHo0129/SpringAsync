@@ -8,6 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +22,8 @@ import com.eric.springasync.service.ProfileLookupService;
 
 @RestController
 public class LookupController {
+	
+	private Logger log = LoggerFactory.getLogger(LookupController.class);
 
 	@Autowired
 	private GithubLookupService githubLookupService;
@@ -51,16 +55,24 @@ public class LookupController {
 		Map<String, Object> result = new HashMap<>();
 		Set<String> pidSet = Stream.of("100024","100008","100080","100604","108196").collect(Collectors.toSet());
 		
+		long start = System.currentTimeMillis();
 		Set<CompletableFuture<Response<Profile>>> resultSet = new HashSet<>();
 		for (String pid: pidSet) {
 			CompletableFuture<Response<Profile>> plusUser = profileLookupService.findUser(pid);
 			resultSet.add(plusUser);
+			result.put(pid, null);
 		}
 		//全部回來之後
-		CompletableFuture.allOf(resultSet.toArray(new CompletableFuture[0])).join();
+		CompletableFuture<Void> allFuture = CompletableFuture.allOf(resultSet.toArray(new CompletableFuture[0]));
+		log.info("阻塞");
+		allFuture.join();
+		log.info("阻塞結束");
 		for (CompletableFuture<Response<Profile>> p: resultSet) {
-			result.put(String.valueOf(p.get().getResponse().getPid()), p.get().getResponse());
+			if (p.get()!=null) {				
+				result.put(String.valueOf(p.get().getResponse().getPid()), p.get().getResponse());
+			}
 		}
+		log.info("Total spent time: "+ (System.currentTimeMillis()-start)/1000.0+" seconds");
 		return result;
 	}
 }

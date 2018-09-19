@@ -27,21 +27,22 @@ public class ProfileLookupService {
 			this.restTemplate = restTemplateBuilder.build();
 		}
 		
-		@Async
+		@Async()
 		public CompletableFuture<Response<Profile>> findUser(String pid) throws Exception {
 			String url = String.format("https://profile.fp.104dc-dev.com/users/%s/profile", pid);
 			log.info("Look up user: "+pid);
 			long start = System.currentTimeMillis();
+			Profile p = new Profile();
+			p.setPid(new Long(pid));
+			Response<Profile> result = new Response<>();
+			result.setResponse(p);
 			
 			Response<Map> resultMap = restTemplate.getForObject(url, Response.class);
-			Profile p = new Profile();
-			p.setPid(MapUtils.getLong(resultMap.getResponse(), "pid"));
 			p.setAvatarFileId(MapUtils.getString(resultMap.getResponse(), "avatarFileId"));
 			p.setIntroduction(MapUtils.getString(resultMap.getResponse(), "introduction"));
 			p.setUserName(MapUtils.getString(resultMap.getResponse(), "userName"));
-			Response<Profile> result = new Response<>();
-			result.setResponse(p);
-			log.info("Spent time: "+ (System.currentTimeMillis()-start)/1000.0+" seconds");
+			log.info("Spent time ("+pid+"): "+ (System.currentTimeMillis()-start)/1000.0+" seconds");
+			
 			return CompletableFuture.completedFuture(result);
 		}
 }
