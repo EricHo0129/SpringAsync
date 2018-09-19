@@ -25,4 +25,5 @@ dependencies {
 	compile 'com.fasterxml.jackson.core:jackson-databind'
 	compile 'org.apache.commons:commons-collections4:4.0'
 	compile 'org.aspectj:aspectjweaver:1.9.1'
+	compile 'com.github.k0kubun:graphql-query-builder:0.2.0'
 }

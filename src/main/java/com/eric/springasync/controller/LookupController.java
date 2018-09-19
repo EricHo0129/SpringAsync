@@ -18,6 +18,7 @@ import com.eric.springasync.model.Profile;
 import com.eric.springasync.model.Response;
 import com.eric.springasync.model.User;
 import com.eric.springasync.service.GithubLookupService;
+import com.eric.springasync.service.GraphQLService;
 import com.eric.springasync.service.ProfileLookupService;
 
 @RestController
@@ -29,6 +30,8 @@ public class LookupController {
 	private GithubLookupService githubLookupService;
 	@Autowired
 	private ProfileLookupService profileLookupService;
+	@Autowired
+	private GraphQLService graphQLService;
 	
 	@GetMapping("/lookup")
 	public Object lookup() throws Exception {
@@ -74,5 +77,12 @@ public class LookupController {
 		}
 		log.info("Total spent time: "+ (System.currentTimeMillis()-start)/1000.0+" seconds");
 		return result;
+	}
+	
+	@GetMapping("/query")
+	public Object query() throws Exception {
+		Object obj = graphQLService.getAllUsers();
+		
+		return obj;
 	}
 }
