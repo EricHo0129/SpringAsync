@@ -56,7 +56,7 @@ public class GraphQLService {
 		
 		Map<String, Object> postsMap = new HashMap<>();
 		postsMap.put("last", 3);
-		//postsMap.put("orderBy", null); //列舉還不知道怎麼丟
+		postsMap.put("orderBy", "id_ASC"); //列舉還不知道怎麼丟
 
 		String querySyntax = GraphQL.createQueryBuilder()
 				.object("allUsers", GraphQL.createObjectBuilder()
@@ -73,7 +73,7 @@ public class GraphQLService {
 				.build();
 		URI url = new URI("https://api.graph.cool/simple/v1/ciyz901en4j590185wkmexyex");
 		Map<String, Object> queryMap = new HashMap<>();
-		queryMap.put("query", String.format("query { %s }",querySyntax));
+		queryMap.put("query", String.format("query { %s }",querySyntax.replaceAll("\"", "")));
 		String request = new ObjectMapper().writeValueAsString(queryMap);
 		HttpEntity<String> entity = new HttpEntity<String>(request ,headers);
 		String result = restTemplate.postForObject(url, entity, String.class);
