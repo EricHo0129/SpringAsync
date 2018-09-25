@@ -81,7 +81,13 @@ public class LookupController {
 	
 	@GetMapping("/query")
 	public Object query() throws Exception {
-		Object obj = graphQLService.getAllUsers();
+		Object obj = graphQLService.getAllUsers();	
+		return obj;
+	}
+	
+	@GetMapping("/buildQuery")
+	public Object buildQuery() throws Exception {
+		Object obj = graphQLService.getAllUsersByBuilder();
 		
 		return obj;
 	}
