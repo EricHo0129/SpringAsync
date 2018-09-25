@@ -56,7 +56,8 @@ public class LookupController {
 	@GetMapping("/find")
 	public Object find() throws Exception {
 		Map<String, Object> result = new HashMap<>();
-		Set<String> pidSet = Stream.of("100024","100008","100080","100604","108196").collect(Collectors.toSet());
+		Set<String> pidSet = Stream.of("100024","100008","100080","100604","108196"
+				,"103474","108190","108206","207808","232368").collect(Collectors.toSet());
 		
 		long start = System.currentTimeMillis();
 		Set<CompletableFuture<Response<Profile>>> resultSet = new HashSet<>();
