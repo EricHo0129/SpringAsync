@@ -2,6 +2,7 @@ package com.eric.springasync.service;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -80,7 +81,30 @@ public class GraphQLService {
 		return new ObjectMapper().readTree(result);
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(String.format("aaa %s %s", "b"));
+	public Object getAllProfiles(List<Long> pidList) throws Exception {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		StringBuffer buff = new StringBuffer();
+		for (Long pid: pidList) {			
+			Map<String, Object> pidMap = new HashMap<>();
+			pidMap.put("pid", pid);
+			
+			String querySyntax = GraphQL.createQueryBuilder()
+					.object("pid_"+pid+":Profile", pidMap, GraphQL.createObjectBuilder()
+							.object("userInfo", GraphQL.createObjectBuilder()
+									.field("userName")
+									.build())
+							.build())
+					.build();
+			buff.append(querySyntax.replaceAll("\"", ""));
+		}
+		
+		URI url = new URI("https://profile.fp.104dc-dev.com/graphql");
+		Map<String, Object> queryMap = new HashMap<>();
+		queryMap.put("query", String.format("query { %s }",buff.toString()));
+		String request = new ObjectMapper().writeValueAsString(queryMap);
+		HttpEntity<String> entity = new HttpEntity<String>(request ,headers);
+		String result = restTemplate.postForObject(url, entity, String.class);
+		return new ObjectMapper().readTree(result);
 	}
 }
